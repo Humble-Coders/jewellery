@@ -8,17 +8,41 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var router: AppRouter
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if router.showMainApp {
+                MainTabView()
+            } else {
+                NavigationStack(path: $router.navigationPath) {
+                    SplashView()
+                        .navigationDestination(for: AppRoute.self) { route in
+                            authRouteView(for: route)
+                        }
+                }
+            }
         }
-        .padding()
+    }
+    
+    @ViewBuilder
+    private func authRouteView(for route: AppRoute) -> some View {
+        switch route {
+        case .welcome:
+            WelcomeView()
+        case .login:
+            LoginView()
+        case .register:
+            RegisterView()
+        case .home:
+            EmptyView()
+        default:
+            EmptyView()
+        }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppRouter())
 }
